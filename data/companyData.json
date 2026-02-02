@@ -1,0 +1,228 @@
+{
+  "companyInfo": {
+    "name": "Twenty4 Secure Storage",
+    "location": "Chelsea Close, Leeds, LS12 4HP",
+    "phone": "0113 426 9111",
+    "hours": "Monday to Friday 7:00 – 19:00, Saturday 8:00 – 17:00, Sunday 9:00 – 14:00",
+    "description": "Award-winning indoor and container self-storage, serviced offices, and container leasing in Leeds. SSA Approved.",
+    "services": [
+      "Indoor Storage",
+      "Container Storage",
+      "Serviced Offices",
+      "Container Leasing"
+    ],
+    "features": [
+      "24/7 CCTV",
+      "Clean, Dry Units",
+      "Flexible Contracts",
+      "No hidden fees",
+      "On-site help (forklift, etc.)",
+      "Drive-up Access",
+      "Packing Materials Available"
+    ]
+  },
+  "pricing": {
+    "note": "All prices include VAT and are per week.",
+    "indoor": {
+      "10sqft": "£13.00",
+      "25sqft": "£18.00",
+      "35sqft": "£22.00",
+      "50sqft": "£28.00",
+      "75sqft": "£36.00",
+      "100sqft": "£38.00",
+      "150sqft": "£63.00",
+      "300sqft": "£116.00"
+    },
+    "container": {
+      "35sqft": "£20.00",
+      "75sqft": "£25.00",
+      "150sqft": "£45.00",
+      "300sqft": "£85.00"
+    },
+    "offices": {
+      "50sqft": "£53.72",
+      "100sqft": "£76.43",
+      "200sqft": "£138.56",
+      "400sqft": "£198.00",
+      "550sqft": "£295.20"
+    }
+  },
+  "policies": {
+    "privacy": "We take privacy seriously. We collect info (name, address, payment, etc.) to provide storage services. We do not knowingly collect data from children under 16. For complaints, contact Lora Hellas at privacy@twenty4storage.com.",
+    "terms": "Main points: You must own the goods, pay fees in advance, and secure your unit. Prohibited items: Food/perishables (unless packed), living creatures, combustibles, firearms/explosives, chemicals/toxic waste, fumes/odours, illegal goods, currency/deeds. Liability limited to £100."
+  },
+  "qa": [
+    {
+      "question": "How much does indoor storage cost?",
+      "answer": "Indoor storage prices start from £13.00/week for 10 sq ft. Other sizes include 25 sq ft (£18.00), 50 sq ft (£28.00), and 100 sq ft (£38.00). All prices include VAT."
+    },
+    {
+      "question": "What are your container storage prices?",
+      "answer": "Our outdoor container storage prices are: 35 sq ft (£20.00/week), 75 sq ft (£25.00/week), 150 sq ft (£45.00/week), and 300 sq ft (£85.00/week). Prices include VAT."
+    },
+    {
+      "question": "What items are prohibited?",
+      "answer": "You cannot store food/perishables (unless securely packed), living creatures, combustible/flammable substances, firearms/explosives, chemicals/toxic waste, illegal goods, or currency/deeds."
+    },
+    {
+      "question": "What is your liability for lost/damaged goods?",
+      "answer": "Our liability for loss of and/or damage to Goods is limited to £100. Goods are stored at your sole risk and must be insured."
+    },
+    {
+      "question": "What are your opening hours?",
+      "answer": "We are open Monday to Friday 7:00 – 19:00, Saturday 8:00 – 17:00, and Sunday 9:00 – 14:00."
+    },
+    {
+      "question": "Where are you located?",
+      "answer": "We are located at Chelsea Close, Leeds, LS12 4HP."
+    },
+    {
+      "question": "What is self storage?",
+      "answer": "Self storage comes in the form of a secure unit that can be used to store both personal and business belongings."
+    },
+    {
+      "question": "How do I choose and reserve a unit?",
+      "answer": "Once you know how much you want to store, simply choose the size of your unit, reserve your unit and move your belongings into your unit. You can then walk away from your unit knowing that your belongings are safely stored."
+    },
+    {
+      "question": "How do I reserve a unit?",
+      "answer": "You can reserve a storage unit by paying a refundable security deposit worth four weeks rent of the size unit you wish to rent. You can do this in our office, over the phone or on our website."
+    },
+    {
+      "question": "How do I get my deposit refund?",
+      "answer": "If you no longer require storage let us know and allow up to 14 days for your refund to be credited back to your account."
+    },
+    {
+      "question": "How much do storage units cost?",
+      "answer": "Costs of storage units varies depending on its size. There is then a fee to pay every 4 weeks. Please see our pricing section for specific costs."
+    },
+    {
+      "question": "Can I view the unit before I book?",
+      "answer": "Yes, we encourage all customers to come onto site and have a tour. We can then work out what is best for each individual and make sure you are happy with the service provided."
+    },
+    {
+      "question": "Do you rent padlocks?",
+      "answer": "Unfortunately we do not offer a padlock rental service. You may bring your own padlock, however, the padlocks we sell onsite are of a suitable durability and the correct size for our unit doors."
+    },
+    {
+      "question": "Can I change my unit size?",
+      "answer": "Yes. If you require a smaller or larger area you may change your room size subject to availability. You just need to sign a new Customer Licence and move your goods from one room to the other."
+    },
+    {
+      "question": "Are there any hidden costs?",
+      "answer": "No, we let you know about any upfront costs upon enquiry. The things you need to take into consideration are: 4 weeks advance rent, refundable security deposit (usually 4 weeks rent), cost of insurance if required, and a padlock if you wish to purchase one from our shop."
+    },
+    {
+      "question": "Do I have to pay in advance?",
+      "answer": "Yes, we ask you to pay in advance."
+    },
+    {
+      "question": "Can I claim VAT back?",
+      "answer": "We are VAT registered. Whether you can claim VAT back depends on you being VAT registered; you can call HMRC to find this out."
+    },
+    {
+      "question": "Is insurance included in the price?",
+      "answer": "No, as we do not know upon quotation the value of the items you wish to store."
+    },
+    {
+      "question": "How much is insurance?",
+      "answer": "Our insurance starts from 50p per week, per £1000 worth of goods."
+    },
+    {
+      "question": "Do I need to take your insurance?",
+      "answer": "No, you may insure your items personally, although we do recommend taking out our insurance as it is specifically developed for storage companies."
+    },
+    {
+      "question": "Do units come with shelving or racking?",
+      "answer": "No, our units are completely empty, although we can sell you suitable racking."
+    },
+    {
+      "question": "Do units have power and lighting?",
+      "answer": "No, however we do provide sockets and/or lighting at an additional cost, but we ask that you allow up to 2 weeks for all additional jobs to be completed."
+    },
+    {
+      "question": "Are the units damp-free and watertight?",
+      "answer": "Yes, all of our units are 100% watertight as they ship products overseas: the only way a unit would get any moisture inside is if a damp item is placed into it. Our container units are designed to endure all weather conditions."
+    },
+    {
+      "question": "Is there CCTV inside the units?",
+      "answer": "No, there is no CCTV inside of the unit, however, all our site CCTV covers every corridor and unit entrance. We have 24/7 CCTV and the site is well-lit and secure."
+    },
+    {
+      "question": "Is parking free?",
+      "answer": "Yes, whilst in our office or loading to and from your unit, parking on site is free."
+    },
+    {
+      "question": "Do you have public toilets?",
+      "answer": "Yes we have public toilets."
+    },
+    {
+      "question": "Are there refreshments available?",
+      "answer": "We can provide hot drinks on site & are located within walking distance of a large supermarket & various cafes."
+    },
+    {
+      "question": "Are children allowed on site?",
+      "answer": "Yes as long as all children are supervised by an adult."
+    },
+    {
+      "question": "Are pets allowed?",
+      "answer": "We ask all pets are kept safely inside your vehicles, other than guide dogs which will be allowed onsite."
+    },
+    {
+      "question": "Can I leave my vehicle on site?",
+      "answer": "No, for security reasons all vehicles left on site will have to be done so with a valid contract. Our parking spaces are flexible and can be taken for as little or long as needed, we use the same process as renting a unit."
+    },
+    {
+      "question": "What ID do I need to bring?",
+      "answer": "We require 2 forms of ID, one must be proof of address and one must be photo ID. Scanned or copied documents will not be accepted."
+    },
+    {
+      "question": "What ID do I need for a business rental?",
+      "answer": "Please provide a letter from the business to confirm that you have the authority to sign the Customer Licence on behalf of the company & a letter/bill confirming company address."
+    },
+    {
+      "question": "Why do you need to keep a record of my ID?",
+      "answer": "For security reasons we need to keep a record of all active customers."
+    },
+    {
+      "question": "Do I need an alternate contact?",
+      "answer": "We ask for an alternate contact in case we are unable to contact yourself for any reason. You will have the option to decide whether this person can gain entry to your unit and/or will be able to discuss your account with us."
+    },
+    {
+      "question": "Do you sell packaging materials?",
+      "answer": "Yes, we sell all packaging materials, such as: shrink wrap, bubble wrap, boxes, furniture covers, and padlocks on-site."
+    },
+    {
+      "question": "Can I use a forklift?",
+      "answer": "Yes, you may rent the forklift out for a small charge, providing you have a valid forklift license. Alternatively we can arrange for a member of our team to assist you."
+    },
+    {
+      "question": "Can you help with removal quotes?",
+      "answer": "Yes, leave the hard work to us, we can gather quotes and find the most suitable for yourself. Then, all you have to do is confirm the time and date you wish to move."
+    },
+    {
+      "question": "Can staff help me unload?",
+      "answer": "Although we do not provide this service as standard, if you need a hand with offloading, a member of our staff can help you with a forklift at an additional cost, providing a suitable person to do so will be on site at this time."
+    },
+    {
+      "question": "How do I change my contact details?",
+      "answer": "You can call or email us to update your telephone number. Any change of address must be proven with a form of ID which should be brought into our office."
+    },
+    {
+      "question": "Do you pass my data to third parties?",
+      "answer": "No. Here at Twenty4 Secure Storage we take your personal data very seriously, we only store your data upon enquiry with your permission."
+    },
+    {
+      "question": "Can I authorize someone else to access my unit?",
+      "answer": "Yes, you can set this up, just inform our staff upon creating your contract."
+    },
+    {
+      "question": "Do you offer drive-up access?",
+      "answer": "Yes, our outdoor units allow you to drive straight up to your unit for stress-free access, with no long corridors to navigate."
+    },
+    {
+      "question": "Can I store for a short time?",
+      "answer": "Yes, we offer short term storage for temporary needs like moving house, as well as long term options for business use or decluttering."
+    }
+  ]
+}

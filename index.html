@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twenty4Storage AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="logo">
+                <img src="assets/logo.png" alt="Twenty4Storage">
+                <h2>T4 Assistant</h2>
+            </div>
+            <ul>
+                <li class="active" data-tab="dashboard">Dashboard</li>
+                <li data-tab="emails">Emails</li>
+                <li data-tab="qa">Q&A Knowledge</li>
+                <li data-tab="settings">Settings</li>
+            </ul>
+        </nav>
+        <main class="content">
+            <div id="dashboard" class="tab-content active">
+                <header>
+                    <h1>Dashboard</h1>
+                    <button id="toggle-btn" class="btn-primary">Start Drafting</button>
+                    <div id="status-indicator" class="status offline">Offline</div>
+                </header>
+                <div class="cards">
+                    <div class="card">
+                        <h3>Emails Checked</h3>
+                        <p id="stats-checked">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>Drafts Created</h3>
+                        <p id="stats-drafted">0</p>
+                    </div>
+                </div>
+                <h2>Recent Activity</h2>
+                <div id="activity-log" class="activity-log">
+                    <!-- Logs will appear here -->
+                </div>
+            </div>
+
+            <div id="emails" class="tab-content">
+                <h1>Replied History</h1>
+                <div id="history-list" class="history-list">
+                    <!-- History items -->
+                </div>
+            </div>
+
+            <!-- Q&A Tab -->
+            <div id="qa" class="tab-content">
+                <h1>Knowledge Base</h1>
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3>Add New Q&A</h3>
+                    <div class="qa-inputs" style="margin-top: 15px;">
+                        <input type="text" id="new-qa-question" placeholder="Enter a new question..."
+                            class="qa-input-full">
+                        <textarea id="new-qa-answer" placeholder="Enter the answer..." rows="3"
+                            class="qa-input-full"></textarea>
+                        <button id="btn-add-qa" class="btn-primary">Add to Knowledge Base</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>Existing Data</h3>
+                        <button id="btn-toggle-qa" class="btn-secondary">Show/Edit All Data</button>
+                    </div>
+                    <div id="qa-list" style="display: none;">
+                        <!-- QA Items loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <h1>Settings</h1>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3>Application Configuration</h3>
+                    <div class="setting-item">
+                        <label>Connected Gmail Account</label>
+                        <div id="gmail-account_display" class="status-indicator"
+                            style="font-weight:bold; margin-bottom:10px;">Checking...</div>
+                        <button id="btn-change-account" class="btn-secondary"
+                            style="font-size:12px; padding:6px 12px;">Change Account (Relogin)</button>
+                    </div>
+                    <div class="setting-item">
+                        <label>Gmail Status</label>
+                        <div class="status-indicator online">Connected</div>
+                    </div>
+                    <div class="setting-item">
+                        <label>AI Model</label>
+                        <select class="setting-input">
+                            <option>Gemini 2.5 Flash Preview</option>
+                            <option>Gemini 1.5 Flash</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Check Interval (seconds)</label>
+                        <input type="number" value="60" class="setting-input">
+                    </div>
+                    <button class="btn-primary">Save Settings</button>
+                </div>
+
+                <div class="card">
+                    <h3>About</h3>
+                    <p style="font-size: 14px; font-weight: 400; color: #666;">
+                        Twenty4 Secure Storage AI Assistant<br>
+                        Version 1.0.0<br>
+                        Powered by Google Gemini & Electron
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="renderer.js"></script>
+</body>
+
+</html>
