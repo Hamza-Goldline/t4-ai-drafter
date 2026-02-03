@@ -12,10 +12,63 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error("CRITICAL ERROR (Unhandled Rejection):", reason);
 });
 
-require('dotenv').config();
+const userDataPath = app.getPath('userData');
 
-let gmailService;
+// Ensure critical files exist in UserData
+function ensureDataFile(filename, subDir = '') {
+    const targetDir = subDir ? path.join(userDataPath, subDir) : userDataPath;
+    if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+    }
+
+    const targetPath = path.join(targetDir, filename);
+
+    // If it doesn't exist in UserData, try to copy from app resources
+    if (!fs.existsSync(targetPath)) {
+        console.log(`File missing in UserData: ${targetPath}. Attempting copy...`);
+        try {
+            // In production, resources are in resources/app.asar handling
+            // We use __dirname which resolves correctly in ASAR to read source
+            // Check if source exists in 'data' folder or root
+            let sourcePath = path.join(__dirname, 'data', filename);
+            if (!fs.existsSync(sourcePath)) {
+                sourcePath = path.join(__dirname, filename);
+            }
+
+            if (fs.existsSync(sourcePath)) {
+                fs.copyFileSync(sourcePath, targetPath);
+                console.log(`Copied ${filename} to ${targetPath}`);
+            } else {
+                console.log(`Source file ${filename} not found, skipping copy.`);
+            }
+        } catch (err) {
+            console.error(`Error copying ${filename}:`, err);
+        }
+    }
+    return targetPath;
+}
+
+// 1. Setup .env
+const envPath = ensureDataFile('.env');
+require('dotenv').config({ path: envPath });
+
+// 2. Setup Gmail Service Paths
+const gmailService = require('./services/gmailService');
+gmailService.setPaths(userDataPath);
+
+// 3. Setup AI Service (load after env)
 let aiService;
+try {
+    console.log("Loading AI Service...");
+    aiService = require('./services/aiService');
+    console.log("AI Service Loaded.");
+} catch (err) {
+    console.error("FAILED to load AI Service:", err);
+}
+
+// Ensure other data files
+ensureDataFile('companyData.json', 'data'); // Creates userData/data/companyData.json
+// Note: We'll access companyData via a helper to get the specific path inside userData
 
 // Function to create the main browser window
 let mainWindow = null; // Keep global reference
@@ -104,21 +157,7 @@ app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') app.quit();
 });
 
-try {
-    console.log("Loading Gmail Service...");
-    gmailService = require('./services/gmailService');
-    console.log("Gmail Service Loaded.");
-} catch (err) {
-    console.error("FAILED to load Gmail Service:", err);
-}
 
-try {
-    console.log("Loading AI Service...");
-    aiService = require('./services/aiService');
-    console.log("AI Service Loaded.");
-} catch (err) {
-    console.error("FAILED to load AI Service:", err);
-}
 
 // Diagnostic Heartbeat
 console.log("End of synchronous main.js execution.");
@@ -146,7 +185,7 @@ ipcMain.handle('get-email-profile', async () => {
 
 ipcMain.handle('logout-gmail', async () => {
     try {
-        const tokenPath = path.join(__dirname, 'token.json');
+        const tokenPath = path.join(userDataPath, 'token.json');
         if (fs.existsSync(tokenPath)) {
             fs.unlinkSync(tokenPath);
         }
@@ -159,7 +198,7 @@ ipcMain.handle('logout-gmail', async () => {
 
 ipcMain.handle('get-company-data', async () => {
     try {
-        const dataPath = path.join(__dirname, 'data', 'companyData.json');
+        const dataPath = path.join(userDataPath, 'data', 'companyData.json');
         if (!fs.existsSync(dataPath)) return null;
         const data = fs.readFileSync(dataPath, 'utf8');
         return JSON.parse(data);
@@ -171,7 +210,7 @@ ipcMain.handle('get-company-data', async () => {
 
 ipcMain.handle('save-company-data', async (event, newData) => {
     try {
-        const dataPath = path.join(__dirname, 'data', 'companyData.json');
+        const dataPath = path.join(userDataPath, 'data', 'companyData.json');
         fs.writeFileSync(dataPath, JSON.stringify(newData, null, 2));
         return { success: true };
     } catch (error) {
@@ -224,7 +263,7 @@ async function checkAndDraft(webContents) {
             return;
         }
 
-        const dataPath = path.join(__dirname, 'data', 'companyData.json');
+        const dataPath = path.join(userDataPath, 'data', 'companyData.json');
         const companyData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
         for (const msg of messages) {
@@ -293,10 +332,16 @@ async function checkAndDraft(webContents) {
             webContents.send('status-update', { type: 'success', message: `Draft created for ${msg.id}` });
 
             // Log to history
-            const historyPath = path.join(__dirname, 'data', 'history.json');
+            const historyPath = path.join(userDataPath, 'data', 'history.json');
+            ensureDataFile('history.json', 'data'); // Ensure it exists before reading/writing
+
             let history = [];
             if (fs.existsSync(historyPath)) {
-                history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+                try {
+                    history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+                } catch (e) {
+                    history = [];
+                }
             }
             history.unshift({
                 id: msg.id,
