@@ -1,6 +1,6 @@
 {
   "name": "t4-ai-drafter",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "An AI-powered email drafting tool for Twenty4 Storage",
   "main": "main.js",
   "scripts": {

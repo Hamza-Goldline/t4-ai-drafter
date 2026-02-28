@@ -365,7 +365,7 @@ async function checkAndDraft(webContents) {
                 { path: path.join(__dirname, 'assets', 'award_2020.jpg'), cid: 'award_2020', contentType: 'image/jpeg' }
             ];
 
-            const fullHtml = `<p><em>(Drafted via ${replyData.source})</em></p>` + replyData.html + footerHtml;
+            const fullHtml = replyData.html + footerHtml;
 
             await gmailService.createDraft(auth, messageDetails, fullHtml, attachments);
 
