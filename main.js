@@ -318,10 +318,10 @@ async function checkAndDraft(webContents) {
             console.log(`Snippet: ${snippet.substring(0, 50)}...`);
             webContents.send('status-update', { type: 'log', message: `Thinking on email ${msg.id}...` });
 
-            let replyContent;
+            let replyData;
             try {
-                replyContent = await aiService.generateReply(snippet, companyData);
-                console.log(`AI Generated Reply: ${replyContent.substring(0, 50)}...`);
+                replyData = await aiService.generateReply(snippet, companyData);
+                console.log(`Generated Reply [${replyData.source}]: ${replyData.html.substring(0, 50)}...`);
             } catch (err) {
                 console.error(`AI Error for ${msg.id}:`, err);
                 webContents.send('status-update', { type: 'error', message: `AI Error: ${err.message}` });
@@ -365,7 +365,7 @@ async function checkAndDraft(webContents) {
                 { path: path.join(__dirname, 'assets', 'award_2020.jpg'), cid: 'award_2020', contentType: 'image/jpeg' }
             ];
 
-            const fullHtml = replyContent + footerHtml;
+            const fullHtml = `<p><em>(Drafted via ${replyData.source})</em></p>` + replyData.html + footerHtml;
 
             await gmailService.createDraft(auth, messageDetails, fullHtml, attachments);
 
@@ -390,7 +390,7 @@ async function checkAndDraft(webContents) {
                 id: msg.id,
                 snippet: snippet,
                 date: new Date().toISOString(),
-                status: 'Drafted'
+                status: `Drafted (${replyData.source})`
             });
             fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
 

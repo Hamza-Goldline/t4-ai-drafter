@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
+const { generateSmartTemplateReply } = require('./smartTemplateService');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -8,7 +9,7 @@ async function generateReply(emailContent, companyData) {
         throw new Error("GEMINI_API_KEY not found in .env");
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-preview-09-2025" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const instructions = `
 1. Read the incoming email snippet carefully.
@@ -30,8 +31,22 @@ EMAIL SNIPPET:
 ${emailContent}
 `;
 
-    const result = await model.generateContent(fullPrompt);
-    return result.response.text();
+    try {
+        const result = await model.generateContent(fullPrompt);
+        return {
+            source: "AI Draft",
+            html: result.response.text()
+        };
+    } catch (error) {
+        console.error("AI failed, falling back to Smart Template:", error.message);
+
+        // Return a response from our localized smart engine!
+        const templateDraft = generateSmartTemplateReply(emailContent, companyData);
+        return {
+            source: "Smart Template",
+            html: templateDraft
+        };
+    }
 }
 
 module.exports = {

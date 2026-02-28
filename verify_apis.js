@@ -47,12 +47,11 @@ async function verify() {
             // log("✅ Gemini Response: " + result.response.text().trim());
 
             // List models to debug
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Fallback init
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // Fallback init
             log("    Listing available models...");
             // Note: The Node SDK for listing models is slightly different.
-            // We can just try a few known ones.
-
-            const modelsToTry = ["gemini-2.5-flash-preview-09-2025", "gemini-1.5-flash", "gemini-pro"];
+            // Check Gemini models
+            const modelsToTry = ["gemini-2.5-flash", "gemini-pro"];
             let workingModel = null;
 
             for (const m of modelsToTry) {
