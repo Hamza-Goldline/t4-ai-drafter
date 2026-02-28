@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twenty4Storage AI Assistant</title>
+    <title>T4 Ai Assistant</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -13,12 +13,12 @@
         <nav class="sidebar">
             <div class="logo">
                 <img src="assets/logo.png" alt="Twenty4Storage">
-                <h2>T4 Assistant</h2>
+                <h2>T4 Ai Assistant</h2>
             </div>
             <ul>
                 <li class="active" data-tab="dashboard">Dashboard</li>
-                <li data-tab="emails">Emails</li>
-                <li data-tab="qa">Q&A Knowledge</li>
+                <li data-tab="emails">Email replies</li>
+                <li data-tab="qa"> Knowledge Base</li>
                 <li data-tab="settings">Settings</li>
             </ul>
         </nav>
@@ -111,11 +111,13 @@
 
                 <div class="card">
                     <h3>About</h3>
-                    <p style="font-size: 14px; font-weight: 400; color: #666;">
-                        Twenty4 Secure Storage AI Assistant<br>
-                        Version 1.0.0<br>
-                        Powered by Google Gemini & Electron
+                    Twenty4 Secure Storage AI Assistant<br>
+                    <span id="app-version-display">Version ...</span><br>
+                    Powered by Google Gemini & Electron
                     </p>
+                    <button id="btn-check-update" class="btn-secondary" style="margin-top: 10px;">Check for
+                        Updates</button>
+                    <p id="update-status" style="font-size: 12px; color: #666; margin-top: 5px;"></p>
                 </div>
             </div>
         </main>

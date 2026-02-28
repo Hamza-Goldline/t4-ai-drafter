@@ -141,6 +141,49 @@ const startApp = () => {
     });
 };
 
+// Handle manual update check from renderer
+ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
+});
+
+ipcMain.handle('check-update', async () => {
+    if (!app.isPackaged) return { status: 'not-packaged' };
+
+    try {
+        const result = await autoUpdater.checkForUpdates();
+        // result.updateInfo exists if update is available
+        // But importantly, result is null if check failed? No, promise rejects.
+        // If no update, result is defined but result.downloadPromise might be null?
+        // Actually Electron-Updater returns UpdateCheckResult
+
+        // If we are here, check was successful.
+        // We rely on 'update-available' event for the dialog, but we want to return status to renderer.
+
+        // Check if update is available based on result
+        if (result && result.updateInfo && result.updateInfo.version !== app.getVersion()) {
+            // Technically version check logic is internal, but...
+            // Let's trust the promise result.
+            // If update is available, autoUpdater will emit 'update-available'
+            return { status: 'update-available', version: result.updateInfo.version };
+        } else {
+            return { status: 'no-update' };
+        }
+    } catch (error) {
+        console.error("Update check error:", error);
+        return { status: 'error', error: error.message };
+    }
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+    console.log(log_message);
+    if (mainWindow) {
+        mainWindow.webContents.send('download-progress', progressObj.percent);
+    }
+});
+
 if (app.isReady()) {
     console.log("App is ALREADY ready. execution startApp immediately.");
     startApp();

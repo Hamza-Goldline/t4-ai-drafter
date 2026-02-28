@@ -1,6 +1,6 @@
 {
   "name": "t4-ai-drafter",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "description": "An AI-powered email drafting tool for Twenty4 Storage",
   "main": "main.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Hamza Nawaz",
   "license": "ISC",
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",

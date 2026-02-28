@@ -198,6 +198,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnChangeAccount = document.getElementById('btn-change-account');
 
     async function loadSettings() {
+        // App Version
+        const version = await window.api.getAppVersion();
+        const versionDisplay = document.getElementById('app-version-display');
+        if (versionDisplay) versionDisplay.textContent = `Version ${version}`;
+
         const email = await window.api.getEmailProfile();
         if (email) {
             gmailAccountDisplay.textContent = email;
@@ -209,6 +214,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             gmailAccountDisplay.style.color = "#d32f2f";
         }
     }
+
+    // Update Progress Listener
+    window.api.onDownloadProgress((percent) => {
+        const status = document.getElementById('update-status');
+        if (status) {
+            status.textContent = `Downloading update: ${Math.round(percent)}%`;
+            status.style.color = "blue";
+        }
+    });
 
     btnChangeAccount.addEventListener('click', async () => {
         if (confirm("This will disconnect the current account and require you to login again. Continue?")) {
@@ -224,6 +238,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load settings when tab is clicked
     document.querySelector('.sidebar li[data-tab="settings"]').addEventListener('click', loadSettings);
+
+    // Update Check Logic
+    const btnCheckUpdate = document.getElementById('btn-check-update');
+    const updateStatus = document.getElementById('update-status');
+
+    if (btnCheckUpdate) {
+        btnCheckUpdate.addEventListener('click', async () => {
+            updateStatus.textContent = "Checking for updates...";
+            updateStatus.style.color = "#666";
+
+            const result = await window.api.checkUpdate();
+
+            if (result.status === 'error') {
+                updateStatus.textContent = "Error: " + result.error;
+                updateStatus.style.color = "red";
+            } else if (result.status === 'not-packaged') {
+                updateStatus.textContent = "App is running in development mode (no updates).";
+            } else if (result.status === 'update-available') {
+                updateStatus.textContent = "Update available! Creating download...";
+                updateStatus.style.color = "green";
+            } else if (result.status === 'no-update') {
+                updateStatus.textContent = "You are on the latest version.";
+                updateStatus.style.color = "green";
+            }
+        });
+    }
 
     // Also load once on startup just in case
     loadSettings();

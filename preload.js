@@ -9,5 +9,10 @@ contextBridge.exposeInMainWorld('api', {
 
     // Auth logic
     getEmailProfile: () => ipcRenderer.invoke('get-email-profile'),
-    logoutGmail: () => ipcRenderer.invoke('logout-gmail')
+    logoutGmail: () => ipcRenderer.invoke('logout-gmail'),
+
+    // Updates
+    checkUpdate: () => ipcRenderer.invoke('check-update'),
+    getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+    onDownloadProgress: (callback) => ipcRenderer.on('download-progress', (event, value) => callback(value))
 });
