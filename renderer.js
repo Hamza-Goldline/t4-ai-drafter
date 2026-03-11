@@ -80,9 +80,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // History Logic
     const historyList = document.getElementById('history-list');
-    function updateHistoryList(historyData) {
+    const btnClearHistory = document.getElementById('btn-clear-history');
+    const btnPrevPage = document.getElementById('btn-prev-page');
+    const btnNextPage = document.getElementById('btn-next-page');
+    const historyPageInfo = document.getElementById('history-page-info');
+
+    let currentHistoryData = [];
+    let historyCurrentPage = 1;
+    const historyItemsPerPage = 10;
+
+    function renderHistoryPage() {
         historyList.innerHTML = '';
-        historyData.forEach(item => {
+        const totalPages = Math.ceil(currentHistoryData.length / historyItemsPerPage);
+        if (totalPages === 0) {
+            historyPageInfo.textContent = "No history";
+            btnPrevPage.disabled = true;
+            btnNextPage.disabled = true;
+            return;
+        }
+
+        if (historyCurrentPage < 1) historyCurrentPage = 1;
+        if (historyCurrentPage > totalPages) historyCurrentPage = totalPages;
+
+        const startIndex = (historyCurrentPage - 1) * historyItemsPerPage;
+        const endIndex = startIndex + historyItemsPerPage;
+        const pageItems = currentHistoryData.slice(startIndex, endIndex);
+
+        pageItems.forEach(item => {
             const card = document.createElement('div');
             card.className = 'history-card';
             card.innerHTML = `
@@ -96,7 +120,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             historyList.appendChild(card);
         });
+
+        historyPageInfo.textContent = `Page ${historyCurrentPage} of ${totalPages}`;
+        btnPrevPage.disabled = historyCurrentPage === 1;
+        btnNextPage.disabled = historyCurrentPage === totalPages;
     }
+
+    function updateHistoryList(historyData) {
+        currentHistoryData = historyData;
+        renderHistoryPage();
+    }
+
+    btnPrevPage.addEventListener('click', () => {
+        historyCurrentPage--;
+        renderHistoryPage();
+    });
+
+    btnNextPage.addEventListener('click', () => {
+        historyCurrentPage++;
+        renderHistoryPage();
+    });
+
+    btnClearHistory.addEventListener('click', async () => {
+        if (confirm("Are you sure you want to completely clear the history logs?")) {
+            const res = await window.api.clearHistory();
+            if (res.success) {
+                currentHistoryData = [];
+                historyCurrentPage = 1;
+                renderHistoryPage();
+                addLog("History cleared.", "success");
+            } else {
+                alert("Failed to clear history.");
+            }
+        }
+    });
 
     // Q&A Logic
     const qaList = document.getElementById('qa-list');
@@ -213,7 +270,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             gmailAccountDisplay.className = "status-indicator offline";
             gmailAccountDisplay.style.color = "#d32f2f";
         }
+
+        // App Settings
+        const settings = await window.api.getAppSettings();
+        document.getElementById('setting-ai-enabled').value = settings.useAI ? "true" : "false";
     }
+
+    const btnSaveSettings = document.getElementById('btn-save-settings');
+    btnSaveSettings.addEventListener('click', async () => {
+        const useAI = document.getElementById('setting-ai-enabled').value === "true";
+        const res = await window.api.saveAppSettings({ useAI, checkInterval: 60 });
+        if (res.success) {
+            addLog(`Settings saved. AI Enabled: ${useAI}`, 'success');
+            alert("Settings saved successfully.");
+        } else {
+            alert("Error saving settings: " + res.error);
+        }
+    });
 
     // Update Progress Listener
     window.api.onDownloadProgress((percent) => {
@@ -267,4 +340,108 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Also load once on startup just in case
     loadSettings();
+
+    // ---------------------------------------------------------
+    // SMART TEMPLATES LOGIC
+    // ---------------------------------------------------------
+    const templatesList = document.getElementById('templates-list');
+    const btnToggleTemplates = document.getElementById('btn-toggle-templates');
+    const btnAddTemplate = document.getElementById('btn-add-template');
+    const newTemplateId = document.getElementById('new-template-id');
+    const newTemplateKeywords = document.getElementById('new-template-keywords');
+    const newTemplateHtml = document.getElementById('new-template-html');
+
+    let isTemplatesVisible = false;
+
+    // Toggle Visibility
+    btnToggleTemplates.addEventListener('click', () => {
+        isTemplatesVisible = !isTemplatesVisible;
+        templatesList.style.display = isTemplatesVisible ? 'block' : 'none';
+        btnToggleTemplates.textContent = isTemplatesVisible ? 'Hide Templates' : 'Show/Edit All Templates';
+        if (isTemplatesVisible) loadTemplates();
+    });
+
+    // Add New Template
+    btnAddTemplate.addEventListener('click', async () => {
+        const tId = newTemplateId.value.trim();
+        const tKeywordsStr = newTemplateKeywords.value.trim();
+        const tHtml = newTemplateHtml.value.trim();
+
+        if (!tId || !tKeywordsStr || !tHtml) return alert("Please fill in all layout fields.");
+
+        const keywords = tKeywordsStr.split(',').map(k => k.trim()).filter(k => k);
+        const data = await window.api.getSmartTemplates() || [];
+
+        data.push({ id: tId, keywords: keywords, template: tHtml });
+
+        const result = await window.api.saveSmartTemplates(data);
+        if (result.success) {
+            newTemplateId.value = '';
+            newTemplateKeywords.value = '';
+            newTemplateHtml.value = '';
+            addLog("New Smart Template added.", "success");
+            if (isTemplatesVisible) loadTemplates();
+        } else {
+            alert("Failed to save template.");
+        }
+    });
+
+    async function loadTemplates() {
+        const data = await window.api.getSmartTemplates();
+        if (data && data.length > 0) {
+            renderTemplates(data);
+        } else {
+            templatesList.innerHTML = '<p>No templates found.</p>';
+        }
+    }
+
+    function renderTemplates(templatesData) {
+        templatesList.innerHTML = '';
+        templatesData.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'qa-item'; // reuse same styling box
+            div.innerHTML = `
+                <div class="qa-inputs">
+                    <label style="font-size:11px; font-weight:bold; color:#999;">ID & KEYWORDS (Comma separated)</label>
+                    <input type="text" value="${item.keywords.join(', ')}" data-index="${index}" class="tmpl-k">
+                    <label style="font-size:11px; font-weight:bold; color:#999; margin-top:5px;">TEMPLATE RESPONSE TEXT</label>
+                    <textarea data-index="${index}" class="tmpl-v" rows="4">${item.template}</textarea>
+                </div>
+                <button class="btn-delete-tmpl btn-delete" data-index="${index}" style="margin-top:10px;">Delete</button>
+            `;
+            templatesList.appendChild(div);
+        });
+
+        // Edit templates
+        document.querySelectorAll('.tmpl-k, .tmpl-v').forEach(input => {
+            input.addEventListener('change', async (e) => {
+                const index = e.target.dataset.index;
+                const isKeywords = e.target.classList.contains('tmpl-k');
+                const data = await window.api.getSmartTemplates();
+
+                if (isKeywords) {
+                    data[index].keywords = e.target.value.split(',').map(k => k.trim()).filter(k => k);
+                } else {
+                    data[index].template = e.target.value;
+                }
+
+                await window.api.saveSmartTemplates(data);
+                addLog("Smart template updated.", "info");
+            });
+        });
+
+        // Delete templates
+        document.querySelectorAll('.btn-delete-tmpl').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if (!confirm("Are you sure you want to delete this template?")) return;
+                const index = e.target.dataset.index;
+                const data = await window.api.getSmartTemplates();
+                data.splice(index, 1);
+                await window.api.saveSmartTemplates(data);
+                loadTemplates(); // Re-render
+                addLog("Template deleted.", "info");
+            });
+        });
+    }
+
 });

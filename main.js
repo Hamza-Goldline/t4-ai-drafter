@@ -103,7 +103,7 @@ const startApp = () => {
 
     // Auto-updater logging
     autoUpdater.logger = console;
-    autoUpdater.logger.transports.file.level = "info";
+    // autoUpdater.logger.transports.file.level = "info";
 
     // Check for updates immediately
     if (app.isPackaged) {
@@ -262,6 +262,77 @@ ipcMain.handle('save-company-data', async (event, newData) => {
     }
 });
 
+// App Settings Handlers
+ipcMain.handle('get-app-settings', async () => {
+    try {
+        const settingsPath = path.join(userDataPath, 'data', 'settings.json');
+        if (!fs.existsSync(settingsPath)) {
+            const defaultSettings = { useAI: true, checkInterval: 60 };
+            ensureDataFile('settings.json', 'data');
+            fs.writeFileSync(settingsPath, JSON.stringify(defaultSettings, null, 2));
+            return defaultSettings;
+        }
+        return JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+    } catch (error) {
+        console.error('Error reading settings:', error);
+        return { useAI: true, checkInterval: 60 };
+    }
+});
+
+ipcMain.handle('save-app-settings', async (event, newSettings) => {
+    try {
+        const settingsPath = path.join(userDataPath, 'data', 'settings.json');
+        fs.writeFileSync(settingsPath, JSON.stringify(newSettings, null, 2));
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving settings:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+// Smart Templates Handlers
+ipcMain.handle('get-smart-templates', async () => {
+    try {
+        const templatePath = path.join(userDataPath, 'data', 'smartTemplates.json');
+        if (!fs.existsSync(templatePath)) {
+            // First time loading: provide defaults from the service file
+            const { defaultTemplates } = require('./services/smartTemplateService');
+            ensureDataFile('smartTemplates.json', 'data');
+            fs.writeFileSync(templatePath, JSON.stringify(defaultTemplates, null, 2));
+            return defaultTemplates;
+        }
+        const data = fs.readFileSync(templatePath, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error reading templates:', error);
+        return [];
+    }
+});
+
+ipcMain.handle('save-smart-templates', async (event, newData) => {
+    try {
+        const templatePath = path.join(userDataPath, 'data', 'smartTemplates.json');
+        fs.writeFileSync(templatePath, JSON.stringify(newData, null, 2));
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving templates:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('clear-history', async () => {
+    try {
+        const historyPath = path.join(userDataPath, 'data', 'history.json');
+        if (fs.existsSync(historyPath)) {
+            fs.writeFileSync(historyPath, JSON.stringify([], null, 2));
+        }
+        return { success: true };
+    } catch (error) {
+        console.error('Error clearing history:', error);
+        return { success: false, error: error.message };
+    }
+});
+
 ipcMain.handle('start-drafting', async (event) => {
     console.log('Starting drafting service...');
     if (draftingInterval) return "Already running";
@@ -309,7 +380,24 @@ async function checkAndDraft(webContents) {
         const dataPath = path.join(userDataPath, 'data', 'companyData.json');
         const companyData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
-        for (const msg of messages) {
+        const templatePath = path.join(userDataPath, 'data', 'smartTemplates.json');
+        let smartTemplates = [];
+        if (fs.existsSync(templatePath)) {
+            smartTemplates = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+        } else {
+            smartTemplates = require('./services/smartTemplateService').defaultTemplates || [];
+        }
+
+        // Load settings to check if AI is enabled
+        const settingsPath = path.join(userDataPath, 'data', 'settings.json');
+        let appSettings = { useAI: true };
+        if (fs.existsSync(settingsPath)) {
+            appSettings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+        }
+
+        // We process each email synchronously to enforce pacing
+        for (let i = 0; i < messages.length; i++) {
+            const msg = messages[i];
             console.log(`Processing email ID: ${msg.id}`);
             webContents.send('status-update', { type: 'log', message: `Reading email ${msg.id}...` });
             const messageDetails = await gmailService.getMessage(auth, msg.id);
@@ -320,52 +408,28 @@ async function checkAndDraft(webContents) {
 
             let replyData;
             try {
-                replyData = await aiService.generateReply(snippet, companyData);
+                if (appSettings.useAI) {
+                    replyData = await aiService.generateReply(snippet, companyData, smartTemplates);
+                } else {
+                    const { generateSmartTemplateReply } = require('./services/smartTemplateService');
+                    replyData = {
+                        source: "Smart Template (AI Disabled)",
+                        html: generateSmartTemplateReply(snippet, companyData, smartTemplates)
+                    };
+                }
                 console.log(`Generated Reply [${replyData.source}]: ${replyData.html.substring(0, 50)}...`);
             } catch (err) {
-                console.error(`AI Error for ${msg.id}:`, err);
-                webContents.send('status-update', { type: 'error', message: `AI Error: ${err.message}` });
+                console.error(`Error drafting for ${msg.id}:`, err);
+                webContents.send('status-update', { type: 'error', message: `Error: ${err.message}` });
                 continue;
             }
 
             console.log(`Creating draft for ${msg.id}...`);
             webContents.send('status-update', { type: 'log', message: `Drafting reply for ${msg.id}...` });
 
-            const footerHtml = `
-<br><br>
-<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
-  <p style="color: #333">
-    <strong>Email:</strong> <a href="mailto:daniella@twenty4storage.com" style="color: #0000EE; text-decoration: underline;">daniella@twenty4storage.com</a><br>
-    <strong>Office:</strong> +44 (0) 113 426 9111<br>
-    Chelsea Close<br>
-    Leeds<br>
-    LS12 4HP
-  </p>
-  <p>
-    <a href="https://www.twenty4storage.com" style="color: #0000EE; text-decoration: underline;">www.twenty4storage.com</a>
-  </p>
-  <p>
-    <img src="cid:logo_wide" alt="Twenty4 Secure Storage" style="width: 250px; height: auto;">
-  </p>
-  <p>
-    <strong>Award winning service</strong><br>
-    Voted Best Container Self Storage Facility 2020.
-  </p>
-  <p>
-    <img src="cid:award_2020" alt="2020 Best Container Self Storage Facility" style="width: 200px; height: auto;">
-  </p>
-  <p style="font-size: 10px; color: #666;">
-    This email and any attachments to it may be confidential and are intended solely for the use of the individual to whom it is addressed. Any views or opinions expressed are solely those of the author and do not necessarily represent those of Twenty4 Secure Storage. If you are not the intended recipient of this email, you must neither take any action based upon its contents, nor copy or show it to anyone. Please contact the sender if you believe you have received this email in error.
-  </p>
-</div>
-`;
+            const attachments = [];
 
-            const attachments = [
-                { path: path.join(__dirname, 'assets', 'logo_wide.png'), cid: 'logo_wide', contentType: 'image/png' },
-                { path: path.join(__dirname, 'assets', 'award_2020.jpg'), cid: 'award_2020', contentType: 'image/jpeg' }
-            ];
-
-            const fullHtml = replyData.html + footerHtml;
+            const fullHtml = replyData.html;
 
             await gmailService.createDraft(auth, messageDetails, fullHtml, attachments);
 
@@ -396,6 +460,13 @@ async function checkAndDraft(webContents) {
 
             webContents.send('status-update', { type: 'history-update', data: history });
             console.log(`Finished processing ${msg.id}`);
+
+            // Limit pace: Wait 5 seconds between emails, unless it is the last one in the queue
+            if (i < messages.length - 1) {
+                console.log("Applying API rate limit pacing: waiting 5 seconds...");
+                webContents.send('status-update', { type: 'log', message: `Queueing next email in 5s (Rate limit protection)...` });
+                await new Promise(resolve => setTimeout(resolve, 5000));
+            }
         }
         console.log("--- Draft Check Complete ---");
     } catch (error) {

@@ -18,7 +18,8 @@
             <ul>
                 <li class="active" data-tab="dashboard">Dashboard</li>
                 <li data-tab="emails">Email replies</li>
-                <li data-tab="qa"> Knowledge Base</li>
+                <li data-tab="qa">Knowledge Base</li>
+                <li data-tab="smart-templates">Smart Templates</li>
                 <li data-tab="settings">Settings</li>
             </ul>
         </nav>
@@ -46,9 +47,18 @@
             </div>
 
             <div id="emails" class="tab-content">
-                <h1>Replied History</h1>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h1 style="margin: 0;">Replied History</h1>
+                    <button id="btn-clear-history" class="btn-secondary"
+                        style="background: #e74c3c; color: white;">Clear History</button>
+                </div>
                 <div id="history-list" class="history-list">
                     <!-- History items -->
+                </div>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px; align-items: center;">
+                    <button id="btn-prev-page" class="btn-secondary" disabled>Previous</button>
+                    <span id="history-page-info">Page 1</span>
+                    <button id="btn-next-page" class="btn-secondary" disabled>Next</button>
                 </div>
             </div>
 
@@ -78,6 +88,35 @@
                 </div>
             </div>
 
+            <!-- Smart Templates Tab -->
+            <div id="smart-templates" class="tab-content">
+                <h1>Smart Templates</h1>
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3>Add New Template</h3>
+                    <div class="qa-inputs" style="margin-top: 15px;">
+                        <input type="text" id="new-template-id" placeholder="Template ID (e.g. gate_code)"
+                            class="qa-input-full" style="margin-bottom: 10px;">
+                        <input type="text" id="new-template-keywords" placeholder="Keywords (comma separated)"
+                            class="qa-input-full" style="margin-bottom: 10px;">
+                        <textarea id="new-template-html" placeholder="Template Plain Text Response..." rows="5"
+                            class="qa-input-full"></textarea>
+                        <button id="btn-add-template" class="btn-primary" style="margin-top: 10px;">Add
+                            Template</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>Existing Templates</h3>
+                        <button id="btn-toggle-templates" class="btn-secondary">Show/Edit All Templates</button>
+                    </div>
+                    <div id="templates-list" style="display: none;">
+                        <!-- Template Items loaded here -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Settings Tab -->
             <div id="settings" class="tab-content">
                 <h1>Settings</h1>
@@ -96,17 +135,18 @@
                         <div class="status-indicator online">Connected</div>
                     </div>
                     <div class="setting-item">
-                        <label>AI Model</label>
-                        <select class="setting-input">
-                            <option>Gemini 2.5 Flash Preview</option>
-                            <option>Gemini 1.5 Flash</option>
+                        <label>AI Drafter Status</label>
+                        <select id="setting-ai-enabled" class="setting-input">
+                            <option value="true">Enabled (AI handles drafts)</option>
+                            <option value="false">Disabled (Use Smart Templates only)</option>
                         </select>
                     </div>
                     <div class="setting-item">
-                        <label>Check Interval (seconds)</label>
-                        <input type="number" value="60" class="setting-input">
+                        <label>Wait Duration (seconds per email API rate limit)</label>
+                        <input type="number" id="setting-api-delay" value="5" class="setting-input" disabled
+                            title="Forced rate limit">
                     </div>
-                    <button class="btn-primary">Save Settings</button>
+                    <button id="btn-save-settings" class="btn-primary">Save Settings</button>
                 </div>
 
                 <div class="card">

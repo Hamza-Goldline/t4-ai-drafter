@@ -6,6 +6,13 @@ contextBridge.exposeInMainWorld('api', {
     startDrafting: () => ipcRenderer.invoke('start-drafting'),
     stopDrafting: () => ipcRenderer.invoke('stop-drafting'),
     onStatusUpdate: (callback) => ipcRenderer.on('status-update', (event, value) => callback(value)),
+    clearHistory: () => ipcRenderer.invoke('clear-history'),
+
+    getSmartTemplates: () => ipcRenderer.invoke('get-smart-templates'),
+    saveSmartTemplates: (data) => ipcRenderer.invoke('save-smart-templates', data),
+
+    getAppSettings: () => ipcRenderer.invoke('get-app-settings'),
+    saveAppSettings: (data) => ipcRenderer.invoke('save-app-settings', data),
 
     // Auth logic
     getEmailProfile: () => ipcRenderer.invoke('get-email-profile'),
